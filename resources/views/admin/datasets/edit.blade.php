@@ -1,0 +1,244 @@
+@extends('admin.layout')
+
+@section('title', 'Edit Dataset')
+@section('page-title', 'Edit Dataset Kuesioner')
+
+@section('content')
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="bi bi-pencil me-2"></i>
+                    Edit Data Kuesioner - {{ $dataset->respondent->nama }}
+                </h6>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('admin.datasets.update', $dataset) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="row">
+                        <!-- Pilih Responden -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="respondent_id" class="form-label fw-bold">
+                                    <i class="bi bi-person me-1"></i>
+                                    Pilih Responden <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('respondent_id') is-invalid @enderror" 
+                                        id="respondent_id" name="respondent_id" required>
+                                    <option value="">-- Pilih Responden --</option>
+                                    @foreach($respondents as $respondent)
+                                        <option value="{{ $respondent->id }}" 
+                                                {{ (old('respondent_id') ?? $dataset->respondent_id) == $respondent->id ? 'selected' : '' }}>
+                                            {{ $respondent->nama }} - {{ $respondent->nim }} ({{ $respondent->jurusan }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('respondent_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Durasi Penggunaan -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="durasi_penggunaan" class="form-label fw-bold">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Durasi Penggunaan per Hari <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('durasi_penggunaan') is-invalid @enderror" 
+                                        id="durasi_penggunaan" name="durasi_penggunaan" required>
+                                    <option value="">-- Pilih Durasi --</option>
+                                    @foreach($dataset->getDurasiOptions() as $durasi)
+                                        <option value="{{ $durasi }}" 
+                                                {{ (old('durasi_penggunaan') ?? $dataset->durasi_penggunaan) == $durasi ? 'selected' : '' }}>
+                                            {{ $durasi }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('durasi_penggunaan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Frekuensi Akses -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="frekuensi_akses" class="form-label fw-bold">
+                                    <i class="bi bi-arrow-repeat me-1"></i>
+                                    Frekuensi Akses per Hari <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('frekuensi_akses') is-invalid @enderror" 
+                                        id="frekuensi_akses" name="frekuensi_akses" required>
+                                    <option value="">-- Pilih Frekuensi --</option>
+                                    @foreach($dataset->getFrekuensiOptions() as $frekuensi)
+                                        <option value="{{ $frekuensi }}" 
+                                                {{ (old('frekuensi_akses') ?? $dataset->frekuensi_akses) == $frekuensi ? 'selected' : '' }}>
+                                            {{ $frekuensi }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('frekuensi_akses')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Perhatian Konten -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="perhatian_konten" class="form-label fw-bold">
+                                    <i class="bi bi-eye me-1"></i>
+                                    Rating Perhatian terhadap Konten <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('perhatian_konten') is-invalid @enderror" 
+                                        id="perhatian_konten" name="perhatian_konten" required>
+                                    <option value="">-- Pilih Rating --</option>
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <option value="{{ $i }}" 
+                                                {{ (old('perhatian_konten') ?? $dataset->perhatian_konten) == $i ? 'selected' : '' }}>
+                                            {{ $i }} - {{ $i == 1 ? 'Sangat Rendah' : ($i == 2 ? 'Rendah' : ($i == 3 ? 'Sedang' : ($i == 4 ? 'Tinggi' : 'Sangat Tinggi'))) }}
+                                        </option>
+                                    @endfor
+                                </select>
+                                @error('perhatian_konten')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Penghayatan -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="penghayatan" class="form-label fw-bold">
+                                    <i class="bi bi-heart me-1"></i>
+                                    Rating Penghayatan Emosional <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('penghayatan') is-invalid @enderror" 
+                                        id="penghayatan" name="penghayatan" required>
+                                    <option value="">-- Pilih Rating --</option>
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <option value="{{ $i }}" 
+                                                {{ (old('penghayatan') ?? $dataset->penghayatan) == $i ? 'selected' : '' }}>
+                                            {{ $i }} - {{ $i == 1 ? 'Sangat Rendah' : ($i == 2 ? 'Rendah' : ($i == 3 ? 'Sedang' : ($i == 4 ? 'Tinggi' : 'Sangat Tinggi'))) }}
+                                        </option>
+                                    @endfor
+                                </select>
+                                @error('penghayatan')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Label Intensitas -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="label_intensitas" class="form-label fw-bold">
+                                    <i class="bi bi-tag me-1"></i>
+                                    Label Intensitas Penggunaan <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select @error('label_intensitas') is-invalid @enderror" 
+                                        id="label_intensitas" name="label_intensitas" required>
+                                    <option value="">-- Pilih Label --</option>
+                                    @foreach($dataset->getLabelOptions() as $label)
+                                        <option value="{{ $label }}" 
+                                                {{ (old('label_intensitas') ?? $dataset->label_intensitas) == $label ? 'selected' : '' }}>
+                                            {{ ucfirst($label) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('label_intensitas')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Type -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-database me-1"></i>
+                                    Tipe Data
+                                </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_training_data" 
+                                           name="is_training_data" value="1" 
+                                           {{ (old('is_training_data') ?? $dataset->is_training_data) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_training_data">
+                                        Gunakan sebagai data training (default: testing data)
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Data training digunakan untuk melatih model C4.5, sedangkan data testing untuk evaluasi akurasi.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ route('admin.datasets.index') }}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Kembali
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-2"></i>
+                                    Update Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Data Info -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-secondary">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="m-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Data Saat Ini
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Responden:</strong> {{ $dataset->respondent->nama }}</p>
+                        <p><strong>NIM:</strong> {{ $dataset->respondent->nim }}</p>
+                        <p><strong>Jurusan:</strong> {{ $dataset->respondent->jurusan }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Durasi:</strong> {{ $dataset->durasi_penggunaan }}</p>
+                        <p><strong>Frekuensi:</strong> {{ $dataset->frekuensi_akses }}</p>
+                        <p><strong>Label:</strong> 
+                            <span class="badge {{ 
+                                $dataset->label_intensitas == 'tinggi' ? 'bg-danger' : 
+                                ($dataset->label_intensitas == 'sedang' ? 'bg-warning' : 'bg-success') 
+                            }}">
+                                {{ ucfirst($dataset->label_intensitas) }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
